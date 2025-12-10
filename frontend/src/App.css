@@ -1,0 +1,184 @@
+/* Page background */
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  background-color: #f3f5fb;
+}
+
+/* Centered app layout */
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.app {
+  width: 100%;
+  max-width: 960px;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 2.1rem;
+  margin-bottom: 0.3rem;
+  color: #111827;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 0.98rem;
+  color: #6b7280;
+}
+
+/* Controls row */
+.controls {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.text-input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.65rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background-color: #111827;
+  color: #f9fafb;
+  font-size: 0.95rem;
+}
+
+.text-input::placeholder {
+  color: #9ca3af;
+}
+
+.primary-button {
+  padding: 0.65rem 1.2rem;
+  border-radius: 8px;
+  border: 1px solid #1d4ed8;
+  background-color: #2563eb;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: 0.95rem;
+  box-shadow: 0 0 0 1px #1d4ed8;
+}
+
+.primary-button:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.primary-button:hover:not(:disabled) {
+  background-color: #1d4ed8;
+}
+
+/* Sections */
+.section {
+  margin-top: 2rem;
+}
+
+.section-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+/* Cards grid */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+/* Card */
+.card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+  border: 1px solid #e5e7eb;
+}
+
+.card-title {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.card-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.card-item {
+  font-size: 0.9rem;
+  margin-bottom: 0.35rem;
+}
+
+.card-item-main {
+  display: inline-block;
+  font-weight: 600;
+  color: #111827;
+}
+
+.card-item-meta {
+  margin-left: 0.25rem;
+  color: #6b7280;
+}
+
+.card-item-note {
+  display: block;
+  font-size: 0.86rem;
+  color: #6b7280;
+}
+
+/* Resource links */
+.link {
+  color: #2563eb;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+/* Error */
+.error {
+  color: #dc2626;
+  font-size: 0.9rem;
+  margin-top: -1rem;
+  margin-bottom: 1rem;
+}
+
+/* Footer */
+.footer {
+  margin-top: 3rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+/* Responsive tweaks */
+@media (max-width: 640px) {
+  .controls {
+    flex-direction: column;
+  }
+
+  .primary-button {
+    width: 100%;
+  }
+}
