@@ -20,3 +20,4 @@ User → React UI → FastAPI → Workflow Orchestrator → Agents → Response 
 This repository uses **CodeRabbit** for automated pull-request reviews,
 documentation checks, and code-quality improvement as part of open-source
 best practices.
+ _Small edit to trigger CodeRabbit review._
