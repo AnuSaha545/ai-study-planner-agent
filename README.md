@@ -2,7 +2,6 @@
 
 > **An AI-powered system for generating personalized weekly study plans with intelligent scheduling and curated learning resources.**
 
-
 [![Python](https://img.shields.io/badge/Python-3.11+-blue)](https://www.python.org/)
 [![React](https://img.shields.io/badge/React-19+-61DAFB)](https://react.dev/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-009688)](https://fastapi.tiangolo.com/)
@@ -89,25 +88,6 @@ PostgreSQL + Kestra
 ```
 
 ---
-
-## 📁 Structure
-
-```
-ai_study_planner_agent/
-├── backend/              # FastAPI + Groq integration
-│   ├── agents/          # PlannerAgent, ResourceAgent
-│   ├── workflows/       # Agent orchestration
-│   ├── main.py          # FastAPI app
-│   └── cli.py          # CLI tool
-├── frontend/            # React 19 + Vite
-│   ├── components/      # WeeklyPlanner, SessionCard
-│   └── src/
-├── database/            # PostgreSQL schema
-├── kestra/              # Workflow definitions
-├── Dockerfile           # Container image
-├── docker-compose.yml   # Services
-└── SETUP.md            # Detailed setup guide
-```
 
 ---
 
