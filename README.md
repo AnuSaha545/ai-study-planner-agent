@@ -1,12 +1,7 @@
 # ✨ AI Study Planner Agent
 
 > **An AI-powered system for generating personalized weekly study plans with intelligent scheduling and curated learning resources.**
-
-[![Python](https://img.shields.io/badge/Python-3.11+-blue)](https://www.python.org/)
-[![React](https://img.shields.io/badge/React-19+-61DAFB)](https://react.dev/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-009688)](https://fastapi.tiangolo.com/)
-[![Docker](https://img.shields.io/badge/Docker-Supported-2496ED)](https://www.docker.com/)
-
+> 
 ---
 
 ## 🎯 Key Features
@@ -78,7 +73,7 @@ python cli.py --subjects "Python,DSA" --hours 3 --days 6
 ## 🏗️ Architecture
 
 ```
-React Frontend (Dark UI)
+React Frontend 
          ↓
 FastAPI Backend (/plan endpoint)
          ↓
