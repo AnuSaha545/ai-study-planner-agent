@@ -332,7 +332,6 @@ export default function App() {
       {/* Footer */}
       <footer className="footer">
         <div className="footer-content">
-          <p>Made with ❤️ by AI Study Planner Team</p>
           <p className="footer-copyright">
             © 2025 AI Study Planner. All rights reserved.
           </p>
