@@ -1,7 +1,8 @@
-"""AI Study Planner Backend API.
+"""
+AI Study Planner Backend API.
 
 FastAPI application providing endpoints for generating personalized
-study plans using multi-agent orchestration.
+study plans using Kestra workflow orchestration.
 """
 
 import logging
@@ -9,13 +10,20 @@ from typing import Dict, List
 
 from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
+import os
+from dotenv import load_dotenv
 
 from agents.planner_agent import DailyPlan
 from agents.resource_agent import SubjectResources
 from workflows.agent_workflow import run_workflow
 
-# Configure logging
+# Load environment variables from .env file
+load_dotenv()
+
+# ---------------------------------------------------------------------
+# Logging configuration
+# ---------------------------------------------------------------------
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -23,14 +31,12 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+# ---------------------------------------------------------------------
+# Request / Response Models
+# ---------------------------------------------------------------------
 class StudyPlanRequest(BaseModel):
-    """Request model for study plan generation.
-    
-    Attributes:
-        subjects: List of subjects to create a plan for
-        hours: Daily study hours (must be positive)
-        days_per_week: Number of days per week to study (default: 6)
-    """
+    """Request model for study plan generation."""
+
     subjects: List[str] = Field(
         ...,
         min_items=1,
@@ -62,12 +68,8 @@ class StudyPlanRequest(BaseModel):
 
 
 class StudyPlanResponse(BaseModel):
-    """Response model for study plan generation.
-    
-    Attributes:
-        plan: List of daily study plans
-        resources: Dictionary of curated resources per subject
-    """
+    """Response model for study plan generation."""
+
     plan: List[DailyPlan]
     resources: Dict[str, SubjectResources]
 
@@ -79,52 +81,50 @@ class StudyPlanResponse(BaseModel):
 
 
 class HealthResponse(BaseModel):
-    """Response model for health check endpoint.
-    
-    Attributes:
-        status: Health status ("ok" or "error")
-        version: API version
-    """
+    """Response model for health check endpoint."""
+
     status: str
     version: str = "1.0.0"
 
 
-# Initialize FastAPI application
+# ---------------------------------------------------------------------
+# FastAPI App
+# ---------------------------------------------------------------------
 app = FastAPI(
     title="AI Study Planner Agent Backend",
-    description="Multi-agent orchestrated study planning service",
+    description="FastAPI backend orchestrating Kestra workflows",
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
 )
 
-# Configure CORS
+# ---------------------------------------------------------------------
+# CORS (allow frontend access)
+# ---------------------------------------------------------------------
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure for production
+    allow_origins=["*"],  # tighten in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-
+# ---------------------------------------------------------------------
+# Health Endpoint
+# ---------------------------------------------------------------------
 @app.get(
     "/health",
     response_model=HealthResponse,
     tags=["Health"],
-    summary="Health check endpoint",
-    description="Verify the API is running and healthy"
+    summary="Health check"
 )
 def health() -> HealthResponse:
-    """Check API health status.
-    
-    Returns:
-        HealthResponse with status and version
-    """
     logger.info("Health check requested")
     return HealthResponse(status="ok")
 
-
+# ---------------------------------------------------------------------
+# Study Plan Endpoint (Kestra-triggered)
+# ---------------------------------------------------------------------
 @app.post(
     "/plan",
     response_model=StudyPlanResponse,
@@ -135,22 +135,22 @@ def health() -> HealthResponse:
     responses={
         200: {"description": "Study plan generated successfully"},
         422: {"description": "Invalid input parameters"},
-        500: {"description": "Server error during plan generation"},
+         500: {"description": "Server error during plan generation"},
     }
 )
 def create_plan(request: StudyPlanRequest) -> StudyPlanResponse:
     """Generate a personalized study plan.
-    
+
     Orchestrates multiple agents to create:
     1. A personalized weekly study schedule
     2. Curated learning resources for each subject
-    
+
     Args:
         request: Study plan request with subjects and hours
-        
+
     Returns:
         StudyPlanResponse with complete plan and resources
-        
+
     Raises:
         HTTPException: If plan generation fails
     """
@@ -189,15 +189,14 @@ def create_plan(request: StudyPlanRequest) -> StudyPlanResponse:
             detail="An unexpected error occurred"
         )
 
-
+# ---------------------------------------------------------------------
+# Lifecycle Events
+# ---------------------------------------------------------------------
 @app.on_event("startup")
 async def startup_event():
-    """Log application startup."""
-    logger.info("AI Study Planner Backend Starting")
-    logger.info("FastAPI Docs available at: /docs")
-
+    logger.info("AI Study Planner Backend starting")
+    logger.info("Docs available at /docs")
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    """Log application shutdown."""
-    logger.info("AI Study Planner Backend Shutting Down")
+    logger.info("AI Study Planner Backend shutting down")

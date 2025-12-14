@@ -1,18 +1,33 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import WeeklyPlanner from "./components/WeeklyPlanner";
 import "./App.css";
 
-const API_BASE_URL = "http://127.0.0.1:8000";
+// Constants
+const BACKEND_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const INITIAL_SUBJECTS = "Python, Data Structures";
+const INITIAL_HOURS = 3;
+const INITIAL_DAYS = 6;
 
+/**
+ * Main App Component
+ * Manages study plan generation and displays weekly schedule with resources
+ */
 export default function App() {
-  const [subjects, setSubjects] = useState("Python, DSA");
-  const [hours, setHours] = useState(3);
-  const [daysPerWeek, setDaysPerWeek] = useState(6);
+  // State Management
+  const [subjects, setSubjects] = useState(INITIAL_SUBJECTS);
+  const [hours, setHours] = useState(INITIAL_HOURS);
+  const [daysPerWeek, setDaysPerWeek] = useState(INITIAL_DAYS);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
-  const validateInputs = () => {
+  /**
+   * Validates user inputs for study plan generation
+   * @returns {Object|null} Validated inputs or null if invalid
+   */
+  const validateInputs = useCallback(() => {
+    // Parse and validate subjects
     const subjectList = subjects
       .split(",")
       .map((s) => s.trim())
@@ -28,22 +43,27 @@ export default function App() {
       return null;
     }
 
+    // Validate daily study hours
     const hoursNum = Number(hours);
-    if (hoursNum < 0.5 || hoursNum > 12) {
+    if (isNaN(hoursNum) || hoursNum < 0.5 || hoursNum > 12) {
       setError("Daily hours must be between 0.5 and 12");
       return null;
     }
 
+    // Validate days per week
     const daysNum = Number(daysPerWeek);
-    if (daysNum < 1 || daysNum > 7) {
+    if (isNaN(daysNum) || daysNum < 1 || daysNum > 7) {
       setError("Days per week must be between 1 and 7");
       return null;
     }
 
     return { subjectList, hoursNum, daysNum };
-  };
+  }, [subjects, hours, daysPerWeek]);
 
-  const handleGenerate = async () => {
+  /**
+   * Handles study plan generation via API call
+   */
+  const handleGenerate = useCallback(async () => {
     const validated = validateInputs();
     if (!validated) return;
 
@@ -53,53 +73,64 @@ export default function App() {
     setData(null);
 
     try {
-      const res = await fetch(`${API_BASE_URL}/plan`, {
+      const response = await fetch(`${BACKEND_URL}/plan`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           subjects: validated.subjectList,
           hours: validated.hoursNum,
-          days_per_week: validated.daysNum
-        })
+          days_per_week: validated.daysNum,
+        }),
       });
 
-      if (!res.ok) {
+      if (!response.ok) {
+        const errorData = await response.json();
         throw new Error(
-          res.status === 422
-            ? "Invalid input parameters"
-            : `Server error: ${res.status}`
+          errorData.detail || "Failed to generate study plan"
         );
       }
 
-      const json = await res.json();
-      setData(json);
+      const planData = await response.json();
+      setData(planData);
       setSuccess(true);
-      setTimeout(() => setSuccess(false), 5000);
+      
+      // Auto-hide success message after 4 seconds
+      setTimeout(() => setSuccess(false), 4000);
     } catch (err) {
-      console.error(err);
-      setError(
-        err.message.includes("Failed to fetch")
-          ? "❌ Backend unreachable. Start the server with: uvicorn main:app --reload"
-          : `❌ ${err.message}`
-      );
+      console.error("Study plan generation error:", err);
+      setError(`❌ ${err.message || "An unexpected error occurred"}`);
     } finally {
       setLoading(false);
     }
-  };
+  }, [validateInputs]);
 
-  const handleExportJSON = () => {
-    if (!data) return;
-    const json = JSON.stringify(data, null, 2);
-    const blob = new Blob([json], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `study-plan-${new Date().toISOString().split('T')[0]}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
+  /**
+   * Exports the generated study plan as JSON file
+   */
+  const handleExportJSON = useCallback(() => {
+    if (!data) {
+      setError("No data to export");
+      return;
+    }
+
+    try {
+      const jsonString = JSON.stringify(data, null, 2);
+      const blob = new Blob([jsonString], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      
+      link.href = url;
+      link.download = `study-plan-${new Date().toISOString().split("T")[0]}.json`;
+      link.click();
+      
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Export error:", err);
+      setError("Failed to export plan");
+    }
+  }, [data]);
 
   return (
     <div className="app-container">
@@ -108,11 +139,15 @@ export default function App() {
         <div className="navbar-content">
           <div className="navbar-brand">
             <span className="logo-icon">📚</span>
-            <span className="logo-text">AI Study Planner</span>
+            <h1 className="logo-text">AI Study Planner</h1>
           </div>
           <div className="navbar-links">
-            <a href="#features" className="nav-link">Features</a>
-            <a href="#about" className="nav-link">About</a>
+            <a href="#features" className="nav-link">
+              Features
+            </a>
+            <a href="#about" className="nav-link">
+              About
+            </a>
           </div>
         </div>
       </nav>
@@ -121,9 +156,9 @@ export default function App() {
         {/* Hero Section */}
         <section className="hero">
           <div className="hero-content">
-            <h1 className="hero-title">Create Your Perfect Study Plan</h1>
+            <h2 className="hero-title">✨ Create Your Perfect Study Plan</h2>
             <p className="hero-subtitle">
-              Powered by AI. Personalized for you. Multi-agent orchestrated workflows.
+              Powered by AI • Personalized for you • Intelligent scheduling
             </p>
           </div>
         </section>
@@ -131,25 +166,36 @@ export default function App() {
         {/* Input Section */}
         <section className="input-section">
           <div className="input-card">
-            <h2 className="input-title">Plan Generator</h2>
-            <p className="input-description">Enter your subjects and study preferences</p>
+            <h2 className="input-title">📋 Plan Generator</h2>
+            <p className="input-description">
+              Enter your subjects and study preferences
+            </p>
 
+            {/* Subjects Input */}
             <div className="form-group">
-              <label className="form-label">Subjects to Study</label>
+              <label className="form-label" htmlFor="subjects-input">
+                Subjects to Study
+              </label>
               <input
+                id="subjects-input"
                 className="form-input"
+                type="text"
                 value={subjects}
                 onChange={(e) => setSubjects(e.target.value)}
                 placeholder="e.g., Python, Data Structures, Web Development"
-                type="text"
+                aria-label="Subjects to study"
               />
               <span className="form-hint">Separate multiple subjects with commas</span>
             </div>
 
+            {/* Hours and Days Input */}
             <div className="form-row">
               <div className="form-group">
-                <label className="form-label">Daily Study Hours</label>
+                <label className="form-label" htmlFor="hours-input">
+                  Daily Study Hours
+                </label>
                 <input
+                  id="hours-input"
                   className="form-input"
                   type="number"
                   min="0.5"
@@ -157,49 +203,59 @@ export default function App() {
                   step="0.5"
                   value={hours}
                   onChange={(e) => setHours(e.target.value)}
+                  aria-label="Daily study hours"
                 />
                 <span className="form-hint">0.5 - 12 hours</span>
               </div>
               <div className="form-group">
-                <label className="form-label">Days Per Week</label>
+                <label className="form-label" htmlFor="days-input">
+                  Days Per Week
+                </label>
                 <input
+                  id="days-input"
                   className="form-input"
                   type="number"
                   min="1"
                   max="7"
                   value={daysPerWeek}
                   onChange={(e) => setDaysPerWeek(e.target.value)}
+                  aria-label="Days per week"
                 />
                 <span className="form-hint">1 - 7 days</span>
               </div>
             </div>
 
+            {/* Error Alert */}
             {error && (
-              <div className="alert alert-error">
-                <span className="alert-icon">⚠️</span>
+              <div className="alert alert-error" role="alert">
+                <span className="alert-icon" aria-hidden="true">⚠️</span>
                 <span>{error}</span>
               </div>
             )}
 
+            {/* Success Alert */}
             {success && (
-              <div className="alert alert-success">
-                <span className="alert-icon">✅</span>
+              <div className="alert alert-success" role="status">
+                <span className="alert-icon" aria-hidden="true">✅</span>
                 <span>Study plan generated successfully!</span>
               </div>
             )}
 
+            {/* Generate Button */}
             <button
               className="btn btn-primary btn-large"
               onClick={handleGenerate}
               disabled={loading}
+              aria-busy={loading}
+              aria-label="Generate study plan"
             >
               {loading ? (
                 <>
-                  <span className="spinner"></span>
+                  <span className="spinner" aria-hidden="true"></span>
                   Generating Plan...
                 </>
               ) : (
-                <>Generate Study Plan</>
+                <>🚀 Generate Study Plan</>
               )}
             </button>
           </div>
@@ -208,84 +264,60 @@ export default function App() {
         {/* Results Section */}
         {data && (
           <section className="results-section">
-            {/* Export Button */}
+            {/* Export Controls */}
             <div className="export-controls">
-              <button className="btn btn-secondary" onClick={handleExportJSON}>
+              <button
+                className="btn btn-secondary"
+                onClick={handleExportJSON}
+                aria-label="Export study plan as JSON"
+              >
                 📥 Export as JSON
               </button>
             </div>
 
-            {/* Weekly Study Plan */}
-            <section className="plan-section">
-              <div className="section-header">
-                <h2 className="section-title">📅 Weekly Study Schedule</h2>
-                <p className="section-description">Your personalized learning journey</p>
-              </div>
+            {/* Weekly Study Plan Component */}
+            <WeeklyPlanner plan={data.plan} />
 
-              <div className="schedule-grid">
-                {data.plan.map((day, idx) => (
-                  <div key={idx} className="schedule-card">
-                    <div className="schedule-header">
-                      <h3 className="schedule-day">{day.day}</h3>
-                      <span className="schedule-hours">{day.total_hours}h</span>
-                    </div>
-
-                    <div className="sessions-list">
-                      {day.sessions.map((session, i) => (
-                        <div key={i} className="session-item">
-                          <div className="session-info">
-                            <span className={`session-type session-${session.session_type.toLowerCase()}`}>
-                              {session.session_type.charAt(0).toUpperCase() + session.session_type.slice(1)}
-                            </span>
-                            <span className="session-subject">{session.subject}</span>
-                          </div>
-                          <span className="session-duration">{session.duration_hours}h</span>
-                          <p className="session-notes">{session.notes}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            {/* Learning Resources */}
-            <section className="resources-section">
+            {/* Learning Resources Section */}
+            <section className="resources-section" aria-label="Learning resources">
               <div className="section-header">
                 <h2 className="section-title">🔗 Learning Resources</h2>
                 <p className="section-description">Curated resources for each subject</p>
               </div>
 
               <div className="resources-grid">
-                {Object.entries(data.resources).map(([subject, links], idx) => (
-                  <div key={idx} className="resource-card">
+                {Object.entries(data.resources).map(([subject, links]) => (
+                  <div key={subject} className="resource-card">
                     <h3 className="resource-title">{subject}</h3>
                     <div className="resource-links">
                       <a
                         href={links.youtube_search}
                         target="_blank"
-                        rel="noreferrer"
+                        rel="noopener noreferrer"
                         className="resource-link"
+                        aria-label={`YouTube courses for ${subject}`}
                       >
-                        <span className="resource-icon">▶️</span>
+                        <span className="resource-icon" aria-hidden="true">▶️</span>
                         <span>YouTube Courses</span>
                       </a>
                       <a
                         href={links.pdf_search}
                         target="_blank"
-                        rel="noreferrer"
+                        rel="noopener noreferrer"
                         className="resource-link"
+                        aria-label={`PDF notes for ${subject}`}
                       >
-                        <span className="resource-icon">📄</span>
+                        <span className="resource-icon" aria-hidden="true">📄</span>
                         <span>PDF Notes</span>
                       </a>
                       <a
                         href={links.freecodecamp}
                         target="_blank"
-                        rel="noreferrer"
+                        rel="noopener noreferrer"
                         className="resource-link"
+                        aria-label={`FreeCodeCamp course for ${subject}`}
                       >
-                        <span className="resource-icon">💻</span>
+                        <span className="resource-icon" aria-hidden="true">💻</span>
                         <span>FreeCodeCamp</span>
                       </a>
                     </div>
@@ -301,7 +333,9 @@ export default function App() {
       <footer className="footer">
         <div className="footer-content">
           <p>Made with ❤️ by AI Study Planner Team</p>
-          <p className="footer-copyright">© 2025 AI Study Planner. All rights reserved.</p>
+          <p className="footer-copyright">
+            © 2025 AI Study Planner. All rights reserved.
+          </p>
         </div>
       </footer>
     </div>

@@ -1,0 +1,91 @@
+.weekly-planner {
+  margin-top: 3rem;
+  animation: slideUp 0.6s ease-out;
+}
+
+.planner-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.planner-header h2 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, var(--accent-light), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.planner-header p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.day-card {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: var(--transition-base);
+  backdrop-filter: blur(10px);
+}
+
+.day-card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-xl);
+  transform: translateY(-4px);
+}
+
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border);
+}
+
+.day-header h3 {
+  font-size: 1.3rem;
+  color: var(--accent-light);
+}
+
+.total-hours {
+  background: linear-gradient(135deg, var(--accent), var(--accent-light));
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.sessions-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.no-sessions {
+  color: var(--text-secondary);
+  text-align: center;
+  padding: 2rem 1rem;
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .days-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .planner-header h2 {
+    font-size: 1.5rem;
+  }
+}

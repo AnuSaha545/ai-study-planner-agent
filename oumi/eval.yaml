@@ -1,0 +1,14 @@
+task: evaluation
+
+dataset:
+  type: json
+  path: ../backend/oumi_eval_data.json
+
+model:
+  provider: openai
+  model: gpt-4o-mini
+
+metrics:
+  - relevance
+  - coherence
+  - completeness

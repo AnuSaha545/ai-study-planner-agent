@@ -1,0 +1,86 @@
+id: study-planner-workflow
+namespace: default
+
+description: |
+  Kestra workflow to generate personalized study plans using AI agent orchestration.
+  This flow calls the FastAPI backend to create study schedules and resource recommendations.
+
+inputs:
+  - id: subjects
+    type: ARRAY
+    description: "List of subjects to study (e.g. ['Python', 'Data Structures'])"
+    defaults: []
+  - id: hours
+    type: FLOAT
+    description: "Daily study hours (1.0-12.0)"
+    defaults: 3.0
+  - id: days_per_week
+    type: INT
+    description: "Days to study per week (1-7)"
+    defaults: 6
+
+tasks:
+  - id: validate-inputs
+    type: io.kestra.core.tasks.flows.WorkingDirectory
+    description: "Validate workflow inputs"
+    tasks:
+      - id: check_subjects
+        type: io.kestra.plugin.scripts.python.Script
+        description: "Validate subjects list"
+        runner: CONTAINER
+        docker:
+          image: python:3.11-slim
+        script: |
+          import json
+          import sys
+          subjects = {{ inputs.subjects | json }}
+          if not subjects or len(subjects) == 0:
+              sys.exit(1)
+          for subject in subjects:
+              if not isinstance(subject, str) or not subject.strip():
+                  sys.exit(1)
+          print("Subjects validation passed")
+
+      - id: check_hours
+        type: io.kestra.plugin.scripts.python.Script
+        description: "Validate study hours"
+        runner: CONTAINER
+        docker:
+          image: python:3.11-slim
+        script: |
+          import sys
+          hours = {{ inputs.hours }}
+          if not isinstance(hours, (int, float)) or hours <= 0 or hours > 12:
+              sys.exit(1)
+          print("Hours validation passed")
+
+  - id: generate-study-plan
+    type: io.kestra.plugin.http.Request
+    description: "Call FastAPI backend to generate study plan"
+    uri: http://host.docker.internal:8000/plan
+    method: POST
+    contentType: application/json
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    body: |
+      {
+        "subjects": {{ inputs.subjects | json }},
+        "hours": {{ inputs.hours }},
+        "days_per_week": {{ inputs.days_per_week }}
+      }
+
+  - id: store-results
+    type: io.kestra.plugin.storage.local.Download
+    description: "Download and store the study plan response"
+    uri: "{{ outputs.generate-study-plan.body }}"
+
+  - id: log-completion
+    type: io.kestra.plugin.log.Log
+    description: "Log workflow completion"
+    message: |
+      Study plan generated successfully!
+      Subjects: {{ inputs.subjects | join(', ') }}
+      Daily hours: {{ inputs.hours }}
+      Days per week: {{ inputs.days_per_week }}
+      Plan available at: {{ outputs.store-results.uri }}

@@ -1,96 +1,199 @@
-# AI Study Planner Agent
+# ✨ AI Study Planner Agent
 
-A workflow-orchestrated multi-agent system that generates personalized
-study plans and curated learning resources based on user inputs.
+> **An AI-powered system for generating personalized weekly study plans with intelligent scheduling and curated learning resources.**
 
-## Features
 
-- Multi-Agent architecture (Planner Agent & Resource Agent)
-- Workflow orchestration
-- FastAPI backend
-- React + Vite frontend
-- Command-line interface for quick access
-- Modular clean codebase
+[![Python](https://img.shields.io/badge/Python-3.11+-blue)](https://www.python.org/)
+[![React](https://img.shields.io/badge/React-19+-61DAFB)](https://react.dev/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-009688)](https://fastapi.tiangolo.com/)
+[![Docker](https://img.shields.io/badge/Docker-Supported-2496ED)](https://www.docker.com/)
 
-## Architecture Overview
+---
 
-User → React UI → FastAPI → Workflow Orchestrator → Agents → Response → UI
+## 🎯 Key Features
 
-## Quick Start
+✅ **AI-Powered Planning** - Groq's llama3-8b generates personalized schedules  
+✅ **Beautiful UI** - Dark theme with cool & calm aesthetics  
+✅ **Weekly Calendar** - Mon-Sun view with time slots  
+✅ **Resource Curation** - YouTube, PDFs, FreeCodeCamp links  
+✅ **Multi-Agent System** - Planner + Resource agents  
+✅ **Docker Ready** - Full containerization  
+✅ **Vercel Deploy** - Production-ready frontend  
 
-### Prerequisites
+---
 
-- Python 3.8+
-- pip (Python package manager)
+## 🚀 Quick Start
 
-### Backend Setup
-
-1. **Install dependencies:**
-   ```bash
-   cd backend
-   pip install fastapi uvicorn requests pydantic
-   ```
-
-2. **Run the FastAPI server:**
-   ```bash
-   uvicorn main:app --reload
-   ```
-   The API will be available at `http://localhost:8000`
-
-### Using the CLI Tool
-
-The CLI tool provides a convenient way to generate study plans from the command line.
-
-#### Basic Usage
-
+### Option 1: Local Development
 ```bash
-python cli.py --subjects "Mathematics, Physics" --hours 3 --days 6
+# Backend
+cd backend
+python -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+echo "GROQ_API_KEY=your_key" > .env
+uvicorn main:app --reload
+
+# Frontend (new terminal)
+cd frontend
+npm install
+VITE_API_URL=http://localhost:8000 npm run dev
 ```
 
-#### Command-Line Arguments
+**Visit**: http://localhost:5173
 
-- `--subjects` / `-s` (required): Comma-separated list of subjects
-- `--hours` (optional): Daily study hours (default: 3)
-- `--days` (optional): Days per week to study (default: 6)
-- `--output` / `-o` (optional): Save plan as JSON file
-- `--api-url` (optional): FastAPI backend URL (default: http://localhost:8000)
-
-#### Examples
-
-**Generate a study plan for multiple subjects:**
+### Option 2: Docker
 ```bash
-python cli.py -s "Python, JavaScript, React" --hours 2 --days 5
+echo "GROQ_API_KEY=your_key" > .env
+docker-compose up -d
 ```
 
-**Generate and save the plan to a file:**
+**Services**:
+- Frontend: http://localhost:5173
+- Backend: http://localhost:8000
+- Kestra: http://localhost:8080
+
+---
+
+## 📖 Usage
+
+### Web Interface
+1. Enter subjects: "Python, DSA, React"
+2. Set hours (0.5-12) and days (1-7)
+3. Generate plan
+4. View weekly schedule with resources
+
+### API
 ```bash
-python cli.py -s "Mathematics, Physics, Chemistry" --hours 4 --days 6 -o my_study_plan.json
+curl -X POST http://localhost:8000/plan \
+  -H "Content-Type: application/json" \
+  -d '{"subjects": ["Python", "DSA"], "hours": 3, "days_per_week": 6}'
 ```
 
-**Use custom API endpoint:**
+### CLI
 ```bash
-python cli.py -s "Biology" --api-url http://192.168.1.100:8000
+python cli.py --subjects "Python,DSA" --hours 3 --days 6
 ```
 
-#### Output Format
+---
 
-The CLI displays a beautifully formatted study plan with:
-- 📅 **Weekly Schedule**: Day-by-day breakdown with session types and durations
-- 📝 **Study Notes**: Specific focus areas for each session
-- 🔗 **Learning Resources**: YouTube, PDF, and FreeCodeCamp links for each subject
+## 🏗️ Architecture
 
-#### Error Handling
+```
+React Frontend (Dark UI)
+         ↓
+FastAPI Backend (/plan endpoint)
+         ↓
+PlannerAgent → ResourceAgent
+         ↓
+PostgreSQL + Kestra
+```
 
-The CLI gracefully handles:
-- ✅ Connection failures (if backend is not running)
-- ✅ Request timeouts
-- ✅ Invalid input validation
-- ✅ API errors with clear error messages
+---
 
-## CodeRabbit Integration
+## 📁 Structure
 
-This repository uses **CodeRabbit** for automated pull-request reviews,
-documentation checks, and code-quality improvement as part of open-source
-best practices.
+```
+ai_study_planner_agent/
+├── backend/              # FastAPI + Groq integration
+│   ├── agents/          # PlannerAgent, ResourceAgent
+│   ├── workflows/       # Agent orchestration
+│   ├── main.py          # FastAPI app
+│   └── cli.py          # CLI tool
+├── frontend/            # React 19 + Vite
+│   ├── components/      # WeeklyPlanner, SessionCard
+│   └── src/
+├── database/            # PostgreSQL schema
+├── kestra/              # Workflow definitions
+├── Dockerfile           # Container image
+├── docker-compose.yml   # Services
+└── SETUP.md            # Detailed setup guide
+```
 
-_Small edit to trigger CodeRabbit review._
+---
+
+## 🔧 Configuration
+
+Create `backend/.env`:
+```env
+GROQ_API_KEY=sk_...your_key...
+LOG_LEVEL=INFO
+DATABASE_URL=postgresql://planner:planner_password_123@localhost:5432/study_planner
+```
+
+---
+
+## 📊 API Response
+
+```json
+{
+  "plan": [
+    {
+      "day": "Monday",
+      "total_hours": 3.0,
+      "sessions": [{
+        "subject": "Python",
+        "session_type": "concept",
+        "duration_hours": 1.0,
+        "notes": "Build fundamentals..."
+      }]
+    }
+  ],
+  "resources": {
+    "Python": {
+      "youtube_search": "...",
+      "pdf_search": "...",
+      "freecodecamp": "..."
+    }
+  }
+}
+```
+
+---
+
+## 🚀 Deployment
+
+**Vercel** (Frontend):
+- Auto-deploy from GitHub
+- Set `VITE_API_URL` environment variable
+
+**Docker** (Backend):
+- Run `docker-compose up -d`
+- Deploy to Railway, Render, or your VPS
+
+---
+
+## 📚 Documentation
+
+- **Setup Guide**: [SETUP.md](SETUP.md)
+- **API Docs**: http://localhost:8000/docs
+- **Groq Console**: https://console.groq.com/
+
+---
+
+## ✨ Technologies
+
+- **Backend**: FastAPI, Pydantic, Groq API
+- **Frontend**: React 19, Vite, CSS Grid
+- **Database**: PostgreSQL 16
+- **Orchestration**: Kestra
+- **Deployment**: Docker, Vercel
+- **CLI**: Click (Python)
+
+---
+
+
+## Why Kestra?
+
+Kestra is used as the workflow orchestration layer to coordinate
+backend API calls, validate execution logic, and enable decision-based
+agent behavior. This allows the AI Study Planner to scale from a simple
+API into a production-ready, observable agent system with retries,
+branching, and scheduling support.
+
+
+## Author
+
+**Anu Saha**
+
+Engineering student and full-stack developer with a strong interest in
+AI systems, workflow orchestration, and scalable backend architectures.

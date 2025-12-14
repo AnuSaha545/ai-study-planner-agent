@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: study-planner-db
+    environment:
+      POSTGRES_USER: planner
+      POSTGRES_PASSWORD: planner_password_123
+      POSTGRES_DB: study_planner
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - planner-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U planner"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: study-planner-backend
+    ports:
+      - "8000:8000"
+    environment:
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      DATABASE_URL: postgresql://planner:planner_password_123@postgres:5432/study_planner
+      LOG_LEVEL: INFO
+    volumes:
+      - ./backend:/app/backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - planner-network
+    restart: unless-stopped
+
+  kestra:
+    image: kestra/kestra:latest
+    container_name: study-planner-kestra
+    command: server standalone
+    ports:
+      - "8080:8080"
+    environment:
+      KESTRA_CONFIGURATION: |
+        kestra:
+          server:
+            basic-auth:
+              enabled: false
+          repository:
+            type: h2
+          queue:
+            type: memory
+          storage:
+            type: local
+            local:
+              basePath: /kestra/storage
+    volumes:
+      - ./kestra:/kestra/flows
+      - kestra_data:/kestra/storage
+    networks:
+      - planner-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  kestra_data:
+
+networks:
+  planner-network:
+    driver: bridge

@@ -1,0 +1,18 @@
+[
+  {
+    "input": {
+      "subjects": ["Mathematics", "Physics"],
+      "hours": 3,
+      "days_per_week": 6
+    },
+    "output": "Weekly study plan with balanced concept and practice sessions for Mathematics and Physics."
+  },
+  {
+    "input": {
+      "subjects": ["Python", "DSA"],
+      "hours": 2,
+      "days_per_week": 5
+    },
+    "output": "Focused study plan prioritizing Python fundamentals and data structures problem-solving."
+  }
+]
