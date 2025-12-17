@@ -53,6 +53,38 @@ PostgreSQL + Kestra
 ---
 
 
+## 🐇 Why CodeRabbit?
+
+CodeRabbit is integrated to provide **AI-powered code review** during development.
+
+It helps maintain clean, readable, and consistent code by automatically reviewing pull requests, identifying potential issues, 
+and suggesting improvements. CodeRabbit acts as an additional quality layer, 
+supporting best practices and long-term maintainability of the codebase.
+
+---
+
+
+## 🛠️ Why Cline?
+
+Cline is used as an **AI development assistant** to improve developer productivity during implementation.
+
+It assists with debugging, refactoring, architectural exploration, and feature development while keeping the developer fully in control. 
+Cline accelerates development without replacing engineering judgment, making it a valuable productivity tool rather than an automated solution.
+
+---
+
+
+## 🚀 Why Vercel?
+
+Vercel is used to deploy and host the frontend application.
+
+It provides seamless GitHub integration, optimized builds for modern frontend frameworks,
+automatic deployments on each commit, and fast global content delivery. 
+Vercel ensures the frontend is production-ready, reliable, and easy to maintain with minimal configuration.
+
+---
+
+
 ## Why Kestra?
 
 Kestra is used as the workflow orchestration layer to coordinate
@@ -70,9 +102,10 @@ branching, and scheduling support.
 Engineering student and full-stack developer with a strong interest in
 AI systems, workflow orchestration, and scalable backend architectures.
 
+GitHub: https://github.com/AnuSaha545
+
 
 ---
 
 CodeRabbit review enabled.
 
----
