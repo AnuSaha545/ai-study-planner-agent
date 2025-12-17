@@ -95,6 +95,18 @@ branching, and scheduling support.
 
 ---
 
+## ⚠️ Backend Availability Note
+
+The frontend of this project is deployed on Vercel and is publicly accessible.
+
+The backend (FastAPI and AI planning logic) is currently designed to run locally or via Docker 
+and is not deployed to a public cloud environment yet. As a result, AI-powered features require the backend service to be running.
+
+This setup reflects a common development-stage architecture and allows the system 
+to be easily extended by deploying the backend to platforms such as Render, Railway, or a VPS in the future.
+
+---
+
 ## Author
 
 **Anu Saha**
