@@ -172,3 +172,5 @@ branching, and scheduling support.
 
 Engineering student and full-stack developer with a strong interest in
 AI systems, workflow orchestration, and scalable backend architectures.
+
+CodeRabbit review enabled.
