@@ -16,12 +16,12 @@ Frontend (Vercel)
 
 ## 🎯 Key Features
 
-✅ **AI-Powered Planning** - Personalized weekly schedules generated using Groq’s llama3-8b model.  
-✅ **Beautiful UI** - Dark-themed interface focused on productivity and reduced distraction.  
-✅ **Weekly Calendar** - Monday–Sunday calendar layout with structured time slots.  
-✅ **Resource Curation** - YouTube, PDFs, FreeCodeCamp links    
-✅ **Multi-Agent Architecture** - Planner Agent and Resource Agent working together for modular intelligence.
-✅ **Production-Ready Setup** -Dockerized backend and Vercel-deployed frontend. 
+✅ **AI-Powered Planning** - Generates personalized weekly schedules using Groq’s LLaMA3-8B model.  
+✅ **Beautiful UI** - A dark-themed interface designed to enhance productivity and reduce distractions.  
+✅ **Weekly Calendar** - Provides a structured Monday–Sunday layout with organized time slots.  
+✅ **Resource Curation** - Includes curated resources such as YouTube videos, PDFs, and FreeCodeCamp links.  
+✅ **Multi-Agent Architecture** - Utilizes a Planner Agent and Resource Agent working together for modular intelligence.  
+✅ **Production-Ready Setup** - Features a Dockerized backend and a Vercel-deployed frontend.  
 
 ---
 
